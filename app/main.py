@@ -6,10 +6,10 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from . import models, database
 
-app = FastAPI(title="FastAPI + SQLite demo")
+app = FastAPI(title="FastAPI + PostgreSQL demo")
 templates = Jinja2Templates(directory="app/templates")
 
-# DB yaradır (əgər yoxdursa)
+# DB yarat
 models.Base.metadata.create_all(bind=database.engine)
 
 # DB session dependency
@@ -24,6 +24,18 @@ def get_db():
 # def read_root():
 #     return {"message": "Salam, FastAPI + SQLite!"}
 
+
+# Startup event ilə test item
+@app.on_event("startup")
+def startup_populate_db():
+    db: Session = database.SessionLocal()
+    if not db.query(models.Item).first():
+        db.add(models.Item(name="söz", description="başa düşmək üçün"))
+        db.add(models.Item(name="cümlə", description="başa düşmək üçün"))
+        db.commit()
+    db.close()
+
+# Create item
 @app.post("/items/", response_model=schemas.Item)
 def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
     db_item = models.Item(name=item.name, description=item.description)
@@ -32,12 +44,12 @@ def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
     db.refresh(db_item)
     return db_item
 
-# Read items (API endpoint)
+# Read items (API)
 @app.get("/items/", response_model=list[schemas.Item])
 def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return db.query(models.Item).offset(skip).limit(limit).all()
 
-# JSON API endpoint (fərqli funksiya adı)
+# JSON API
 @app.get("/api/items")
 def read_items_api(db: Session = Depends(get_db)):
     return db.query(models.Item).all()
