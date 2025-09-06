@@ -20,9 +20,9 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/")
-def read_root():
-    return {"message": "Salam, FastAPI + SQLite!"}
+# @app.get("/")
+# def read_root():
+#     return {"message": "Salam, FastAPI + SQLite!"}
 
 @app.post("/items/", response_model=schemas.Item)
 def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
@@ -32,14 +32,14 @@ def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
     db.refresh(db_item)
     return db_item
 
+# Read items (API endpoint)
 @app.get("/items/", response_model=list[schemas.Item])
 def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return db.query(models.Item).offset(skip).limit(limit).all()
 
-
-# API endpoint
+# JSON API endpoint (fərqli funksiya adı)
 @app.get("/api/items")
-def read_items(db: Session = Depends(get_db)):
+def read_items_api(db: Session = Depends(get_db)):
     return db.query(models.Item).all()
 
 # HTML səhifə
