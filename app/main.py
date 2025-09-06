@@ -1,8 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
+
 from . import models, schemas, database
+from fastapi import FastAPI, Request, Depends
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session
+from . import models, database
 
 app = FastAPI(title="FastAPI + SQLite demo")
+templates = Jinja2Templates(directory="app/templates")
 
 # DB yaradır (əgər yoxdursa)
 models.Base.metadata.create_all(bind=database.engine)
@@ -30,3 +35,15 @@ def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
 @app.get("/items/", response_model=list[schemas.Item])
 def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return db.query(models.Item).offset(skip).limit(limit).all()
+
+
+# API endpoint
+@app.get("/api/items")
+def read_items(db: Session = Depends(get_db)):
+    return db.query(models.Item).all()
+
+# HTML səhifə
+@app.get("/", response_class=HTMLResponse)
+def read_index(request: Request, db: Session = Depends(get_db)):
+    items = db.query(models.Item).all()
+    return templates.TemplateResponse("index.html", {"request": request, "items": items})
