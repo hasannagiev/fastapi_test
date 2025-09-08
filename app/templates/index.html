@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FastAPI + SQLite Demo</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>FastAPI Demo</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
 </head>
 <body>
-    <h1>Items from Database</h1>
+    <h1>Items list</h1>
     <ul>
         {% for item in items %}
-            <li>{{ item.name }}</li>
+            <li>{{ item.name }} - {{ item.description }}</li>
         {% endfor %}
     </ul>
+
+    <script src="{{ url_for('static', path='script.js') }}"></script>
 </body>
 </html>

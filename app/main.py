@@ -5,8 +5,15 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from . import models, database
+from fastapi.staticfiles import StaticFiles  # <-- əlavə et
+
 
 app = FastAPI(title="FastAPI + PostgreSQL demo")
+
+# static fayllar üçün
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+
 templates = Jinja2Templates(directory="app/templates")
 
 # DB yarat
@@ -25,15 +32,15 @@ def get_db():
 #     return {"message": "Salam, FastAPI + SQLite!"}
 
 
-# Startup event ilə test item
-@app.on_event("startup")
-def startup_populate_db():
-    db: Session = database.SessionLocal()
-    if not db.query(models.Item).first():
-        db.add(models.Item(name="söz", description="başa düşmək üçün"))
-        db.add(models.Item(name="cümlə", description="başa düşmək üçün"))
-        db.commit()
-    db.close()
+# # Startup event ilə test item
+# @app.on_event("startup")
+# def startup_populate_db():
+#     db: Session = database.SessionLocal()
+#     if not db.query(models.Item).first():
+#         db.add(models.Item(name="söz", description="başa düşmək üçün"))
+#         db.add(models.Item(name="cümlə", description="başa düşmək üçün"))
+#         db.commit()
+#     db.close()
 
 # Create item
 @app.post("/items/", response_model=schemas.Item)
