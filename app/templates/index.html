@@ -1,17 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="az">
 <head>
-    <title>FastAPI Demo</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+    <meta charset="UTF-8">
+    <title>Item CRUD</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Items list</h1>
+    <h1>Sözlər (FastAPİ və PostgresSQL)</h1>
+
+    <form action="/items/create" method="post">
+        <input type="text" name="name" placeholder="Yeni söz" required>
+        <input type="text" name="description" placeholder="Təsvir">
+        <button type="submit">Əlavə et</button>
+    </form>
+
     <ul>
         {% for item in items %}
-            <li>{{ item.name }} - {{ item.description }}</li>
+        <li>
+            {{ item.name }} - {{ item.description or "" }}
+            <form action="/items/update/{{ item.id }}" method="post" style="display:inline;">
+                <input type="text" name="name" placeholder="Yeni ad" required>
+                <input type="text" name="description" placeholder="Yeni təsvir">
+                <button type="submit">Redaktə et</button>
+            </form>
+            <form action="/items/delete/{{ item.id }}" method="post" style="display:inline;">
+                <button type="submit">Sil</button>
+            </form>
+        </li>
+        {% else %}
+        <li>Hələ heç bir item yoxdur.</li>
         {% endfor %}
     </ul>
-
-    <script src="{{ url_for('static', path='script.js') }}"></script>
 </body>
 </html>
