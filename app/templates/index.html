@@ -2,34 +2,49 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <title>Item CRUD</title>
+    <title>CRUD_prinsipinin_izahı</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-    <h1>Sözlər (FastAPİ və PostgresSQL)</h1>
+<body class="container mt-5">
 
-    <form action="/items/create" method="post">
-        <input type="text" name="name" placeholder="Yeni söz" required>
-        <input type="text" name="description" placeholder="Təsvir">
-        <button type="submit">Əlavə et</button>
+    <h1 class="text-teal mb-4">Sözlər (FastAPİ və PostgresSQL)</h1>
+
+    <!-- CREATE -->
+    <form action="/items/create" method="post" class="mb-4 d-flex gap-2 flex-wrap">
+        <input type="text" name="name" placeholder="Yeni söz" class="form-control" required>
+        <input type="text" name="description" placeholder="Təsvir" class="form-control">
+        <button type="submit" class="btn btn-success">Əlavə et</button>
     </form>
 
-    <ul>
+    <!-- ITEM LIST -->
+    <ul class="list-group">
         {% for item in items %}
-        <li>
-            {{ item.name }} - {{ item.description or "" }}
-            <form action="/items/update/{{ item.id }}" method="post" style="display:inline;">
-                <input type="text" name="name" placeholder="Yeni ad" required>
-                <input type="text" name="description" placeholder="Yeni təsvir">
-                <button type="submit">Redaktə et</button>
-            </form>
-            <form action="/items/delete/{{ item.id }}" method="post" style="display:inline;">
-                <button type="submit">Sil</button>
-            </form>
+        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <strong>{{ item.name }}</strong> - {{ item.description or "" }}
+            </div>
+            <div class="d-flex gap-2 mt-2 mt-md-0">
+                <!-- UPDATE -->
+                <form action="/items/update/{{ item.id }}" method="post" class="d-flex gap-2 flex-wrap">
+                    <input type="text" name="name" placeholder="Yeni ad" class="form-control" required>
+                    <input type="text" name="description" placeholder="Yeni təsvir" class="form-control">
+                    <button type="submit" class="btn btn-primary btn-sm">Redaktə et</button>
+                </form>
+
+                <!-- DELETE -->
+                <form action="/items/delete/{{ item.id }}" method="post">
+                    <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                </form>
+            </div>
         </li>
         {% else %}
-        <li>Hələ heç bir item yoxdur.</li>
+        <li class="list-group-item">Hələ heç bir item yoxdur.</li>
         {% endfor %}
     </ul>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
