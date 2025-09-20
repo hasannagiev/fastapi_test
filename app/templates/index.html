@@ -1,0 +1,136 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="az">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Gemini AI Analysis</title>-->
+<!--    &lt;!&ndash; Bootstrap CSS &ndash;&gt;-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <style>-->
+<!--        body {-->
+<!--            padding-top: 40px;-->
+<!--            background-color: #f8f9fa;-->
+<!--        }-->
+<!--        .container {-->
+<!--            max-width: 700px;-->
+<!--            background-color: #fff;-->
+<!--            padding: 30px;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 0 15px rgba(0,0,0,0.1);-->
+<!--        }-->
+<!--        .analysis {-->
+<!--            white-space: pre-wrap; /* Line breaks üçün */-->
+<!--            background-color: #e9ecef;-->
+<!--            padding: 20px;-->
+<!--            border-radius: 8px;-->
+<!--            margin-top: 20px;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <div class="container">-->
+<!--        <h1 class="text-center mb-4">AI ilə söz analizi</h1>-->
+<!--        <form method="post" action="/analyze">-->
+<!--            <div class="mb-3">-->
+<!--                <label for="name" class="form-label">Söz:</label>-->
+<!--                <input type="text" class="form-control" id="name" name="name" required>-->
+<!--            </div>-->
+<!--            <div class="mb-3">-->
+<!--                <label for="description" class="form-label">Təsvir (istəyə bağlı):</label>-->
+<!--                <input type="text" class="form-control" id="description" name="description">-->
+<!--            </div>-->
+<!--            <button type="submit" class="btn btn-primary">Analiz et</button>-->
+<!--        </form>-->
+
+<!--        {% if analysis %}-->
+<!--        <div class="analysis mt-4">-->
+<!--            <h4>Nəticə:</h4>-->
+<!--            {{ analysis }}-->
+<!--        </div>-->
+<!--        {% endif %}-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Bootstrap JS (optional) &ndash;&gt;-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Söz Analizi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        #loader { display: none; }
+    </style>
+</head>
+<body class="p-5">
+    <div class="container">
+        <h1 class="mb-4">SUFİ bazası üçün AI söz analizatoru (beta)</h1>
+
+        <form id="analysisForm">
+            <div class="mb-3">
+                <label for="name" class="form-label">Söz:</label>
+                <input type="text" class="form-control" id="name" name="name" pattern="^\S+$" title="Yalnız bir söz daxil edin" required>
+
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Cümlə konteksti (istəyə bağlı):</label>
+                <input type="text" class="form-control" id="description" name="description">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:150px; height:45px; background-color:#007bff; color:white;">Analiz et</button>
+             <!-- Hələ hazır olmayan düymələr -->
+            <button type="button" class="btn" style="width:150px; height:45px; background-color:#28a745; color:white;">Düzəliş et</button>
+            <button type="button" class="btn" style="width:150px; height:45px; background-color:#ffc107; color:white;">Saxla</button>
+            <button type="button" class="btn" style="width:150px; height:45px; background-color:#17a2b8; color:white;">Bazadan axtar</button>
+
+        </form>
+
+        <!-- Loader -->
+        <div id="loader" class="mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Yüklənir...</span>
+            </div>
+            <span>Analiz gedir...</span>
+        </div>
+
+        <!-- Nəticə -->
+        <div id="result" class="mt-4"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById("analysisForm");
+        const loader = document.getElementById("loader");
+        const result = document.getElementById("result");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const description = document.getElementById("description").value;
+            form.reset();
+
+            loader.style.display = "block";
+            result.innerHTML = "";
+
+            try {
+                const response = await fetch("/analyze", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, description })
+                });
+                const data = await response.json();
+                loader.style.display = "none";
+
+                // Nəticəni göstər
+                result.innerHTML = `<h4>Nəticə:</h4>
+                    <div class="border p-3 bg-light" style="white-space: pre-wrap;">${data.analysis}</div>`;
+            } catch (err) {
+                loader.style.display = "none";
+                result.innerHTML = `<div class="text-danger">Xəta: ${err}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>
